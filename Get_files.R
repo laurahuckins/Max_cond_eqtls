@@ -74,6 +74,8 @@ vcf_rm<-which(colnames(vcf_file)%in%rmfile[,1])
 
 vcf_file<-vcf_file[,-(vcf_rm)]
 
+meta<-read.delim("/sc/orga/projects/CommonMind/scratch/adobbyn/IDS_COVS.txt", header=T, sep="\t")
+
 indivs.use<-intersect(colnames(rnaseqfile), colnames(vcf_file))
 
 vcf_file<-vcf_file[,indivs.use]
@@ -88,13 +90,13 @@ rnaseqfile<-as.matrix(rnaseqfile)
 #gene1=SlicedData(matrix(rnaseqfile[1,]))
 #snps1=SlicedData(matrix(vcf_file[1,]))
 
-meta<-read.delim("/sc/orga/projects/CommonMind/data/MERGED_METADATA.csv", header=T, sep=",")
+#meta<-read.delim("/sc/orga/projects/CommonMind/data/MERGED_METADATA.csv", header=T, sep=",")
 
-metaids<-read.delim("/sc/orga/projects/CommonMind/lhuckins/Meta.ids.matched", header=F, sep='')
+#metaids<-read.delim("/sc/orga/projects/CommonMind/lhuckins/Meta.ids.matched", header=F, sep='')
 
-metaids.up<-toupper(metaids[,1])
+#metaids.up<-toupper(metaids[,1])
 
-meta<-meta[which(metaids.up %in% indivs.use),]
+meta<-meta[which(meta[,5] %in% indivs.use),]
 meta.use<-metaids.up[which(metaids.up %in% indivs.use)]
 
 rownames(meta)<-meta.use
