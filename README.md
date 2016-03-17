@@ -21,4 +21,8 @@ genepos: a data.frame file, colnames(genepos)<-c("geneid", "chr", "left", "right
 
 This file takes the output of Get_files.R and creates a formatted maxeqtlt file. If you only want maxeqtls, you're done now! This will give you a max eqtlt for every gene. 
 
+3. iterate_maxcond.R
 
+This file will iteratively find conditional eqtls, conidiotning on max, then max + cond1, etc.
+
+Inputs: maxeqtl file from get_max.R, initial files loaded from Get_files.R
