@@ -6,4 +6,13 @@ I have iterated over 10 differents sets if IDs as well, in order to be compatibl
 
 This folder contains the following code snippets:
 
+1. Get_files.R :
 
+This file is a messy way of getting all the files I need in the right format, and removing any unwanted ids from the list. I take no responsibility for this file!
+The outputs of this file are:
+
+vcf_file: this contains the dosages for all snps that you want to test. Rownames= snps, colnames= samples ids
+rnaseqfile: this contains gene expr values for all genes. Rownames= genes, colnames= samples ids, same order as vcf_file
+meta: my covariate file. 
+snpspos: a data.frame file, colnames(snpspos)<-c("snpid", "chr", "pos")
+genepos: a data.frame file, colnames(genepos)<-c("geneid", "chr", "left", "right")
