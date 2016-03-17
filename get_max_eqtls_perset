@@ -46,3 +46,5 @@ eqtls=me$cis$eqtls
 
 return(eqtls)
 }
+
+maxeqtllist.sets=lapply(1:10, get_max)
