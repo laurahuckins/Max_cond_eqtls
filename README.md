@@ -16,3 +16,7 @@ rnaseqfile: this contains gene expr values for all genes. Rownames= genes, colna
 meta: my covariate file. 
 snpspos: a data.frame file, colnames(snpspos)<-c("snpid", "chr", "pos")
 genepos: a data.frame file, colnames(genepos)<-c("geneid", "chr", "left", "right")
+
+2. get_max_eqtls.R
+
+This file takes the output of Get_files.R and creates a formatted maxeqtlt file. If you only want maxeqtls, you're done now!
