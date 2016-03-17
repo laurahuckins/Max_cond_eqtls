@@ -5,7 +5,7 @@
 # This function takes the cross-validation fold you want to test.
 # So set=1 means first cross-validation iteration, so the 40 test ids for that iteration will be excluded.
 
-# input.row is the row relating to the gene of interest, from get.max.R
+# input.row is the row relating to the gene of interest, from get_max_eqtls.R
 
 iterate<-function(set, input.row){
 
