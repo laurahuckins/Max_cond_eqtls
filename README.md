@@ -19,4 +19,6 @@ genepos: a data.frame file, colnames(genepos)<-c("geneid", "chr", "left", "right
 
 2. get_max_eqtls.R
 
-This file takes the output of Get_files.R and creates a formatted maxeqtlt file. If you only want maxeqtls, you're done now!
+This file takes the output of Get_files.R and creates a formatted maxeqtlt file. If you only want maxeqtls, you're done now! This will give you a max eqtlt for every gene. 
+
+
