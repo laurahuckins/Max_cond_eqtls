@@ -7,11 +7,20 @@
 
 # input.row is the row relating to the gene of interest, from get_max_eqtls.R
 
-iterate<-function(set, input.row){
+iterate<-function(set, genename){
+
+# Get the max eqtl for that gene, for this cv set.
+
+gene.locs<-which(maxeqtllist.sets[[set]][,2]==genename)
+max.use<-gene.locs[which(maxeqtllist.sets[[set]][gene.locs,4]==min(maxeqtllist.sets[[set]][gene.locs,4]))]
+
+if(length(max_use)==1){ # If we only have one max eqtl...
 
 # The first section sets us up to deal with set-specific ids. Comment this section to use all, and set rnaseqfile.set=rnaseqfile, etc.
 
 setids<-sets[[set]][,1]
+
+input.row=maxeqtllist.sets[[set]][max.use,]
 
 vcf_file.set<-vcf_file[,-(which(colnames(vcf_file)%in%setids))]
 cov.set<-cov[,-(which(colnames(vcf_file)%in%setids))]
@@ -78,6 +87,12 @@ pass_flag=0 # we no longer reach significance
 
 iteration=iteration+1
 }
+} else {    # what to do if we have two max eqtls
+
+output.row<-maxeqtllist.sets[[set]][max.use,]
+output.row<-cbind(output.row,"Mult_maxes")
+
+}
 
 output.row<-cbind(output.row, output.row[,7])
 output.row[,8]<-as.character(set)
@@ -88,10 +103,10 @@ return(output.row)
 
 # The function below iterates over all sets and produces an output file with eqtls listed by cross-validation fold, and max/cond status.
 
-get_nice_output<-function(i, maxeqtllist){  # This will allow us to iterate over all the sets and get a single output file
+get_nice_output<-function(index, genes){  # This will allow us to iterate over all the sets and get a single output file
 
-# here, uterate over set lists as well
-output=lapply(1:10,iterate, maxeqtllist[i,])
+# here, iterate over set lists as well
+output=lapply(1:10,iterate, as.character(genes[index]))
 
 output.sets=do.call(rbind, out)
 output.sets[,1]<-output.sets[1,1] # Make sure all first row info is the genename as character
@@ -101,6 +116,6 @@ return(output.sets)
 
 # Finally, call both functions in lapply to get a file with iterations over all cross-validation folds, and all max/cond eqtls:
 
-output.new=lapply(1:3, get_nice_output, maxeqtllist)
+output.new=lapply(1:3, get_nice_output, genes)
 output=do.call(rbind, output.new)
 
