@@ -58,13 +58,13 @@ iterate<-function(set, genename, threshold){
                 verbose = TRUE,
                 #output_file_name.cis = file.path(outdir, cisfilename),
                 output_file_name.cis = "temp.cis",
-                pvOutputThreshold.cis = 0.1,
+                pvOutputThreshold.cis = threshold*2,
                 snpspos = snpspos,
                 genepos = genepos,
                 cisDist = 1e6,
                 #pvalue.hist = "qqplot",
                 min.pv.by.genesnp = FALSE,
-                noFDRsaveMemory = TRUE);
+                noFDRsaveMemory = FALSE);
 
             if(me1$cis$eqtls[1,4]<=threshold){ #the first row is the most significant, so this is our min pval test
                 snploc=c(snploc,which(rownames(vcf_file)==as.character(me1$cis$eqtls[1,1]))) # attach the new max signficant eqtl
