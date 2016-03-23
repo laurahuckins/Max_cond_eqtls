@@ -12,7 +12,7 @@
 chr=10
 
 library("MatrixEQTL")
-
+library("parallel")
 # Load in necessary files:
 
 rnaseqfile<-read.delim("/sc/orga/projects/CommonMind/lhuckins/prediXcan_files/DLPFC.ensembl.KNOWN_AND_SVA.ADJUSTED.VOOM_NORMALIZED.GE.WEIGHTED_RESIDUALS.chr10.tsv", header=T, sep='')
