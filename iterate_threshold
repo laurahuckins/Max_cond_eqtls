@@ -1,0 +1,89 @@
+# If we want to calculate FDR downstream (rather than in the loop) then use the following iteration code:
+
+iterate<-function(set, genename, threshold){
+
+# Get the max eqtl for that gene, for this cv set.
+
+    gene.locs<-which(maxeqtllist.sets[[set]][,2]==as.character(genename))
+    max.use<-gene.locs[which(maxeqtllist.sets[[set]][gene.locs,4]==min(maxeqtllist.sets[[set]][gene.locs,4]))][1]
+    input.row=maxeqtllist.sets[[set]][max.use,]
+    output.row<-cbind(input.row, "1")
+    colnames(output.row)[7]<-"iteration"
+
+    if(input.row[4]<=threshold){
+
+    # The first section sets us up to deal with set-specific ids. Comment this section to use all, and set rnaseqfile.set=rnaseqfile, etc.
+
+        setids<-sets[[set]][,1]
+
+        vcf_file.set<-vcf_file[,-(which(colnames(vcf_file)%in%setids))]
+        cov.set<-cov[-(which(rownames(cov)%in%setids)),]
+        rnaseqfile.set<-rnaseqfile[,-(which(colnames(rnaseqfile)%in%setids))]
+
+        # End of section to deal with individual sets
+
+        iteration =2
+
+        genename=as.character(input.row[1,2])
+        snploc=which(rownames(vcf_file.set)==as.character(input.row[1,1])) # attach our max eqtl
+
+        gene1=SlicedData$new();
+        gene1$CreateFromMatrix(as.matrix(t(rnaseqfile.set[genename,])))
+        rownames(gene1)<-genename
+        pass_flag=1
+
+        while(pass_flag==1){
+
+            if(length(snploc)==1){
+                cov1=cbind(cov.set, vcf_file.set[snploc,])
+                } else {
+                cov1=cbind(cov.set, t(vcf_file.set[snploc,]))
+            }
+
+            cvrt1 = SlicedData$new();
+            cvrt1$CreateFromMatrix(as.matrix(t(cov1)))
+
+            snps1=SlicedData$new()
+            snps1$CreateFromMatrix(as.matrix(vcf_file.set[-(snploc),]))
+
+            useModel=modelLINEAR
+            me1 = Matrix_eQTL_main(
+                snps = snps1,
+                gene = gene1,
+                cvrt = cvrt1,
+                #output_file_name     = file.path(outdir, transfilename),
+                pvOutputThreshold     = 0,
+                useModel = useModel,
+                #errorCovariance = errorCovariance,
+                verbose = TRUE,
+                #output_file_name.cis = file.path(outdir, cisfilename),
+                output_file_name.cis = "temp.cis",
+                pvOutputThreshold.cis = 0.1,
+                snpspos = snpspos,
+                genepos = genepos,
+                cisDist = 1e6,
+                #pvalue.hist = "qqplot",
+                min.pv.by.genesnp = FALSE,
+                noFDRsaveMemory = TRUE);
+
+            if(me1$cis$eqtls[1,4]<=threshold){ #the first row is the most significant, so this is our min pval test
+                snploc=c(snploc,which(rownames(vcf_file)==as.character(me1$cis$eqtls[1,1]))) # attach the new max signficant eqtl
+                new<-cbind(me1$cis$eqtls[1,], as.character(iteration))
+                colnames(new)<-colnames(output.row)
+                output.row<-rbind(output.row, new)
+                } else {
+                #new<-cbind(me1$cis$eqtls[1,], "fail")
+                #colnames(new)<-colnames(output.row)
+                #output.row<-rbind(output.row, new)
+                #output.row
+                pass_flag=0 # we no longer reach significance
+            }
+
+            iteration=iteration+1
+        }
+    }
+    output.row<-cbind(output.row, output.row[,7])
+    output.row[,8]<-as.character(set)
+    colnames(output.row)[8]<-"Set"
+    return(output.row)
+}
