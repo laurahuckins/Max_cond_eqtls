@@ -26,3 +26,7 @@ This file takes the output of Get_files.R and creates a formatted maxeqtlt file.
 This file will iteratively find conditional eqtls, conidiotning on max, then max + cond1, etc.
 
 Inputs: maxeqtl file from get_max.R, initial files loaded from Get_files.R
+
+4. iterate_threshold
+
+This allows user input of threshold on RAW PVALUE rather than FDR corrected. FDR cprrection should be done downstream instead. 
