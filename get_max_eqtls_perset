@@ -47,4 +47,4 @@ eqtls=me$cis$eqtls
 return(eqtls)
 }
 
-maxeqtllist.sets=lapply(1:10, get_max)
+maxeqtllist.sets=mclapply(1:10, get_max) # mclapply is // lapply; for local environs or non-cluster computing switch to lapply
