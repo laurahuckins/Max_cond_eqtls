@@ -1,0 +1,7 @@
+# The fdr correction coming out of matrix eqtl is based on the size of the input file:
+
+# ie, if you chunk up the genome, it will be false.
+
+# Instead: apply a loose threshold (Ngenes, say), and calc fdr downstream, as follows:
+
+# p.adjust(pval, "BH", Ntests)
