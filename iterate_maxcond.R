@@ -106,7 +106,9 @@ return(output.row)
 get_nice_output<-function(index, genes){  # This will allow us to iterate over all the sets and get a single output file
 
 # here, iterate over set lists as well
-output=lapply(1:10,iterate, as.character(genes[index]))
+output=mclapply(1:10,iterate, as.character(genes[index]))
+
+# mclappaly is a parrallelised version of lapply; for local environments etc switch to lapply
 
 output.sets=do.call(rbind, out)
 output.sets[,1]<-output.sets[1,1] # Make sure all first row info is the genename as character
@@ -116,6 +118,6 @@ return(output.sets)
 
 # Finally, call both functions in lapply to get a file with iterations over all cross-validation folds, and all max/cond eqtls:
 
-output.new=lapply(1:3, get_nice_output, genes)
+output.new=mclapply(1:3, get_nice_output, genes) # mclapply is // lappaly, see above comment.
 output=do.call(rbind, output.new)
 
