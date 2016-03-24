@@ -1,0 +1,25 @@
+# need to speed it up a lot
+
+# step one: pull out only chr10 exons: faster to read in.
+
+cat /sc/orga/projects/CommonMind/lhuckins/prediXcan_files/exon_locs | awk '$2==10 {print $0}' > /sc/orga/projects/CommonMind/lhuckins/prediXcan_files/exon_locs.chr10
+
+#jobfile_exon:
+#!/bin/bash
+
+name=$1
+R  --vanilla < get_maxcond_threshold_exon.R $name > get_maxcond_threshold_exon.Rout
+
+# step two: pull out groups of 500 exons at a time, and feed in
+
+split -l 50 /sc/orga/projects/CommonMind/lhuckins/prediXcan_files/exon_locs.chr10 exon_locs_segments/exon_locs
+
+for input in exon_locs_segments/exon_locsa*
+
+do
+
+echo $input
+
+bsub -q low -P acc_psychgen -W 01:00 -R rusage[mem=20000] ./jobfile_exon $input
+
+done
