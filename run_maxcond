@@ -1,0 +1,25 @@
+# this is the procedure for getting max/cond eqtls
+
+chr=10
+threshold=5e-06
+
+# Only run for genes with at least on eqtl in every cv set:
+maxeqtllist.sets=mclapply(1:10, get_max, 0.05)
+
+genes<-vector(10, mode="list")
+
+genes.list<-unique(maxeqtllist.sets[[1]][,2])
+
+for(i in 2:10){
+genes[[i]]<-unique(maxeqtllist.sets[[i]][,2])
+genes.list<-intersect(genes.list, genes[[i]])
+print(length(genes[[i]]))
+}
+
+genes<-unique(genes.list)
+
+output=do.call(rbind, mclapply(1:3,get_nice_output_mc, threshold))
+
+write.table(output....)
+
+
