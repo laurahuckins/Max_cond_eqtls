@@ -1,0 +1,122 @@
+//
+//  get_files_exons.s
+//  MatrixEQTL
+//
+//  Created by Laura Huckins on 3/24/16.
+//  Copyright © 2016 Laura Huckins. All rights reserved.
+//
+
+//
+//  get_maxcond.s
+//  MatrixEQTL
+//
+//  Created by Laura Huckins on 3/23/16.
+//  Copyright © 2016 Laura Huckins. All rights reserved.
+//
+
+//
+//  Get_maxcond_EQTLS.s
+//  
+//
+//  Created by Laura Huckins on 3/16/16.
+//
+
+
+#nb: from MERGED_META, R, $70, > , cat /sc/orga/projects/CommonMind/lhuckins/Meta.ids.tmp | sed 's/CMC_//g;s/_PFC//g;s/DRPC//g;s/Penn_0/Penn_/g;s/DLPC//g;s/CCM_//g;s/_DLPFC//g;s/bp /bp_/g' | awk '{print $1$2}' > /sc/orga/projects/CommonMind/lhuckins/Meta.ids.matched
+
+
+//
+
+chr=10
+
+library("MatrixEQTL")
+library("parallel")
+
+
+# Load in necessary files:
+
+rnaseqfile<-read.delim("/sc/orga/projects/CommonMind/lhuckins/prediXcan_files/Chr10_exons", header=T, sep='')
+
+vcf_file<-read.delim(sprintf("/sc/orga/projects/CommonMind/scratch/adobbyn/eqtl/CMC_from_SYNAPSE/CM5-chr%s_imputed.dos.id",chr), header=T, sep='')
+
+vcf_file.perm<-vcf_file # keep a copy just in case as this is slow to load
+
+snplist=read.delim("/sc/orga/work/huckil01/filt_file/Chr10.ldpruned.bim", header=F)
+
+# for each exon, cycle through all snps in the chr (that fall within snplist)
+
+
+dupl<-which(duplicated(vcf_file$SNP)==TRUE)
+vcf_file<-vcf_file[-(dupl),]
+
+keep<-which(vcf_file$SNP %in% snplist[,1])
+
+vcf_file<-vcf_file[keep,]
+rownames(vcf_file)<-vcf_file$SNP
+
+snpspos<-vcf_file[,c(2,1,3)]
+snpspos[,2]<-10
+snpspos<-data.frame(snpspos)
+colnames(snpspos)<-c("snpid", "chr", "pos")
+
+rownames(rnaseqfile)<-rnaseqfile[,2]
+
+sets=vector(10, mode="list")    # This is so I can calc for each set of indivs at the same time
+
+for (i in 1:10){
+
+sets[[i]]<-read.delim(sprintf("/sc/orga/projects/CommonMind/lhuckins/prediXcan_files/BSLMM/Ids.set%s", i), header=F, sep='')
+
+}
+
+gencode<-read.delim("/sc/orga/projects/CommonMind/lhuckins/prediXcan_files/exon_locs", header=F, sep='')
+
+rownames(gencode)<-gencode[,1]
+
+genes.use<-intersect(rownames(gencode), rownames(rnaseqfile))
+
+rnaseqfile<-rnaseqfile[genes.use,]
+gencode<-gencode[genes.use,]
+
+genepos<-data.frame(gencode)
+colnames(genepos)<-c("geneid", "chr", "left", "right")
+
+rmfile=read.delim("/sc/orga/projects/CommonMind/lhuckins/non-caucasian.ids", header=F, sep='')
+
+vcf_rm<-which(colnames(vcf_file)%in%rmfile[,1])
+
+vcf_file<-vcf_file[,-(vcf_rm)]
+
+meta<-read.delim("/sc/orga/projects/CommonMind/scratch/adobbyn/IDS_COVS.txt", header=T, sep="\t")
+
+indivs.use<-intersect(intersect(colnames(rnaseqfile), colnames(vcf_file)),meta[,5])
+
+vcf_file<-vcf_file[,indivs.use]
+rnaseqfile<-rnaseqfile[,indivs.use]
+
+vcf_file<-as.matrix(vcf_file)
+rnaseqfile<-as.matrix(rnaseqfile)
+
+meta<-meta[which(meta[,5] %in% indivs.use),]
+
+rownames(meta)<-meta[,5]
+
+cov<-meta[,6:10]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
